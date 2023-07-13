@@ -49,18 +49,7 @@ class _UsersPageState extends State<UsersPage> {
             user.email!,
             style: const TextStyle(fontSize: 16),
           ),
-          actions: [
-            GestureDetector(
-                onTap: () {
-                  _signOut();
-                // setState(() {});
-                Navigator.of(context).pop();
-                },
-                child: const Icon(Icons.logout)),
-            const Padding(
-              padding: EdgeInsets.all(10),
-            )
-          ],
+        
           centerTitle: true,
         ),
         body: Column(children: [
@@ -94,18 +83,15 @@ class _UsersPageState extends State<UsersPage> {
                       const SizedBox(
                         height: 20,
                       ),
-                      const Text(
-                        'Welcome',
+                       Text(
+                        widget.name,
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
                         height: 6,
                       ),
-                      Text(
-                        widget.name,
-                        style: const TextStyle(fontSize: 16),
-                      ),
+                      
                       const Divider(
                         color: Color.fromARGB(255, 99, 99, 99),
                         thickness: 0.5,

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_application_1/pages/edit_user_page.dart';
 import 'package:flutter_application_1/pages/send_or_update_data_screen.dart';
 import 'package:flutter_application_1/pages/users_page.dart';
@@ -14,6 +15,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late ScrollController controller;
+  bool isFabVisible = false;
   final user = FirebaseAuth.instance.currentUser!;
   void _signOut() async {
     try {
@@ -24,13 +27,12 @@ class _HomePageState extends State<HomePage> {
      print(e);
      print('error signout');
     }
-  
-  
-}
+    }
+   
   @override
   Widget build(BuildContext context) {
    return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: isFabVisible ? FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return  SendOrUpdateData();
@@ -39,7 +41,8 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: const Color.fromARGB(255, 191, 169, 200),
         icon: const Icon(Icons.add),
         label: const Text("Create New Account"),
-      ),
+      )
+      : null,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
@@ -85,139 +88,149 @@ class _HomePageState extends State<HomePage> {
                 
 
                 return streamSnapshot.hasData
-                    ? ListView.builder(
-                        // padding: EdgeInsets.symmetric(vertical: 41),
-                        itemCount: streamSnapshot.data!.docs.length,
-                        itemBuilder: ((context, index) {
-                          // print(streamSnapshot.data!.docs[index]['user_role']);
-                          // print('streamSnapshot.data');
-                          //  print(streamSnapshot.data!.docs[index].reference.id);
-                          // print('streamSnapshot.id');
-                          // print(streamSnapshot.data!.docs[index]['email']);
-                          // print(user.email);
-                          // print('check same');
-
-                          return SizedBox(
-                              height: 100,
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => UsersPage(
-                                            name: streamSnapshot
-                                                .data!.docs[index]['full_name'],
-                                            phone: streamSnapshot.data!
-                                                .docs[index]['phone_number'],
-                                            email: streamSnapshot
-                                                .data!.docs[index]['email'],
-                                            dateofbirth: streamSnapshot.data!
-                                                .docs[index]['date_of_birth'],
-                                            accounttype: streamSnapshot.data!
-                                                .docs[index]['account_type'],
-                                            roletype: streamSnapshot
-                                                .data!.docs[index]['user_role'],
-                                            id: streamSnapshot.data!.docs[index]
-                                                ['id'],
-                                          )));
-                                },
-                                child: Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ListTile(
-                                      leading: CircleAvatar(
-                                        radius: 50,
-                                        backgroundColor:
-                                            Color.fromARGB(255, 191, 169, 200),
-                                        child: Icon(
-                                          Icons.person,
-                                          color: Colors.white,
+                    ? NotificationListener<UserScrollNotification>(
+                      onNotification: (notification) {
+                        if (notification.direction == ScrollDirection.forward){
+                          if (!isFabVisible) setState(() => isFabVisible = true);
+                        } else if (notification.direction == ScrollDirection.reverse){
+                          if (isFabVisible) setState(() => isFabVisible = false);
+                        }
+                        return true;
+                      },
+                      child: ListView.builder(
+                          // padding: EdgeInsets.symmetric(vertical: 41),
+                          itemCount: streamSnapshot.data!.docs.length,
+                          itemBuilder: ((context, index) {
+                            // print(streamSnapshot.data!.docs[index]['user_role']);
+                            // print('streamSnapshot.data');
+                            //  print(streamSnapshot.data!.docs[index].reference.id);
+                            // print('streamSnapshot.id');
+                            // print(streamSnapshot.data!.docs[index]['email']);
+                            // print(user.email);
+                            // print('check same');
+                    
+                            return SizedBox(
+                                height: 100,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) => UsersPage(
+                                              name: streamSnapshot
+                                                  .data!.docs[index]['full_name'],
+                                              phone: streamSnapshot.data!
+                                                  .docs[index]['phone_number'],
+                                              email: streamSnapshot
+                                                  .data!.docs[index]['email'],
+                                              dateofbirth: streamSnapshot.data!
+                                                  .docs[index]['date_of_birth'],
+                                              accounttype: streamSnapshot.data!
+                                                  .docs[index]['account_type'],
+                                              roletype: streamSnapshot
+                                                  .data!.docs[index]['user_role'],
+                                              id: streamSnapshot.data!.docs[index]
+                                                  ['id'],
+                                            )));
+                                  },
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ListTile(
+                                        leading: CircleAvatar(
+                                          radius: 50,
+                                          backgroundColor:
+                                              Color.fromARGB(255, 191, 169, 200),
+                                          child: Icon(
+                                            Icons.person,
+                                            color: Colors.white,
+                                          ),
                                         ),
-                                      ),
-                                      title: Text(
-                                        streamSnapshot.data!.docs[index]
-                                            ['full_name'],
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      subtitle: Text(
-                                        streamSnapshot.data!.docs[index]
-                                            ['email'],
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                      trailing: Wrap(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          EditUserPage(
-                                                            name: streamSnapshot
-                                                                    .data!
-                                                                    .docs[index]
-                                                                ['full_name'],
-                                                            phone: streamSnapshot
-                                                                    .data!
-                                                                    .docs[index]
-                                                                [
-                                                                'phone_number'],
-                                                            email: streamSnapshot
-                                                                    .data!
-                                                                    .docs[index]
-                                                                ['email'],
-                                                            dateofbirth: streamSnapshot
-                                                                    .data!
-                                                                    .docs[index]
-                                                                [
-                                                                'date_of_birth'],
-                                                            accounttype: streamSnapshot
-                                                                    .data!
-                                                                    .docs[index]
-                                                                [
-                                                                'account_type'],
-                                                            roletype: streamSnapshot
-                                                                    .data!
-                                                                    .docs[index]
-                                                                ['user_role'],
-                                                            id: streamSnapshot
-                                                                    .data!
-                                                                    .docs[index]
-                                                                ['id'],
-                                                          )));
-                                            },
-                                            child: Icon(
-                                              Icons.edit,
-                                              color: Colors.grey[600],
-                                              size: 21,
+                                        title: Text(
+                                          streamSnapshot.data!.docs[index]
+                                              ['full_name'],
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        subtitle: Text(
+                                          streamSnapshot.data!.docs[index]
+                                              ['email'],
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                        trailing: Wrap(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            EditUserPage(
+                                                              name: streamSnapshot
+                                                                      .data!
+                                                                      .docs[index]
+                                                                  ['full_name'],
+                                                              phone: streamSnapshot
+                                                                      .data!
+                                                                      .docs[index]
+                                                                  [
+                                                                  'phone_number'],
+                                                              email: streamSnapshot
+                                                                      .data!
+                                                                      .docs[index]
+                                                                  ['email'],
+                                                              dateofbirth: streamSnapshot
+                                                                      .data!
+                                                                      .docs[index]
+                                                                  [
+                                                                  'date_of_birth'],
+                                                              accounttype: streamSnapshot
+                                                                      .data!
+                                                                      .docs[index]
+                                                                  [
+                                                                  'account_type'],
+                                                              roletype: streamSnapshot
+                                                                      .data!
+                                                                      .docs[index]
+                                                                  ['user_role'],
+                                                              id: streamSnapshot
+                                                                      .data!
+                                                                      .docs[index]
+                                                                  ['id'],
+                                                            )));
+                                              },
+                                              child: Icon(
+                                                Icons.edit,
+                                                color: Colors.grey[600],
+                                                size: 21,
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          GestureDetector(
-                                            onTap: () async {
-                                              final docData = FirebaseFirestore
-                                                  .instance
-                                                  .collection('users')
-                                                  .doc(streamSnapshot
-                                                      .data!.docs[index]['id']);
-                                              await docData.delete();
-                                            },
-                                            child: Icon(
-                                              Icons.delete,
-                                              color: Colors.grey[600],
-                                              size: 21,
+                                            SizedBox(
+                                              width: 10,
                                             ),
-                                          )
-                                        ],
+                                            GestureDetector(
+                                              onTap: () async {
+                                                final docData = FirebaseFirestore
+                                                    .instance
+                                                    .collection('users')
+                                                    .doc(streamSnapshot
+                                                        .data!.docs[index]['id']);
+                                                await docData.delete();
+                                              },
+                                              child: Icon(
+                                                Icons.delete,
+                                                color: Colors.grey[600],
+                                                size: 21,
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ));
-                        }))
+                                ));
+                          })),
+                    )
                     : Center(
                         child: CircularProgressIndicator(
                         color: Colors.deepPurple,
