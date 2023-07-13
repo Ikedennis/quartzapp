@@ -402,7 +402,7 @@ class _EditUserPageState extends State<EditUserPage> {
                         color: Colors.white,
                       )
                     : Text(
-                        'Edit',
+                        'Enter',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
